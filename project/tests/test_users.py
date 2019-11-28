@@ -5,7 +5,7 @@ def test_add_user(test_app):
     client = test_app.test_client()
     resp = client.post(
         "/users",
-        data=json.dumps({"username": "kim", "email": "kimkopowski@gmail.com"}),
+        data=json.dumps({"lastName": "Kopowski", "firstName": "Kim", "email": "kimkopowski@gmail.com"}),
         content_type="application/json",
     )
     data = json.loads(resp.data.decode())
