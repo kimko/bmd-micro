@@ -10,3 +10,8 @@ run:
 
 logs:
 	docker logs -f bmd-micro_api_1
+
+test:
+	# Run unit tests.
+	docker-compose exec api pytest "project/tests" -p no:warnings --cov="project" --cov-report html
+	open htmlcov/index.html
