@@ -21,4 +21,9 @@ def create_app(script_info=None):
 
     api.add_resource(Ping, "/ping")
 
+    from project.api.users import User, UserList
+
+    api.add_resource(UserList, "/users")
+    api.add_resource(User, "/users/<user_id>")
+
     return app
