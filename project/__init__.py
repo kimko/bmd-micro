@@ -8,6 +8,7 @@ from flask_restful import Api
 
 def create_app(script_info=None):
     from project.config import LoggerConfig
+
     LoggerConfig()
 
     # instantiate the app
