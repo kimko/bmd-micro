@@ -115,3 +115,48 @@ def test_remove_user_incorrect_id(test_app):
     assert resp.status_code == 404
     assert "User does not exist" in data["message"]
     assert "fail" in data["status"]
+
+
+def test_update_user(test_app):
+    user = add_user(firstName="user-to-be-updated", email="update-me@meh.io")
+    client = test_app.test_client()
+    resp_one = client.put(
+        f"/users/{user.id}",
+        data=json.dumps({"firstName": "me", "email": "update-me@meh.io"}),
+        content_type="application/json",
+    )
+    data = json.loads(resp_one.data.decode())
+    assert resp_one.status_code == 200
+    assert f"{user.id} was updated!" in data["message"]
+    assert "success" in data["status"]
+    resp_two = client.get(f"/users/{user.id}")
+    data = json.loads(resp_two.data.decode())
+    assert resp_two.status_code == 200
+    print(data)
+    assert "me" in data["data"]["firstName"]
+    assert "update-me@meh.io" in data["data"]["email"]
+    assert "success" in data["status"]
+
+
+def test_update_user_incorrect_id(test_app):
+    client = test_app.test_client()
+    resp = client.put(
+        "/users/999",
+        data=json.dumps({"firstName": "me", "email": "update-me@meh.io"}),
+        content_type="application/json",
+    )
+    data = json.loads(resp.data.decode())
+    assert resp.status_code == 404
+    assert "User does not exist" in data["message"]
+    assert "fail" in data["status"]
+
+
+def test_update_user_invalid_json(test_app):
+    client = test_app.test_client()
+    resp = client.put(
+        "/users/999", data=json.dumps({}), content_type="application/json"
+    )
+    data = json.loads(resp.data.decode())
+    assert resp.status_code == 400
+    assert "Invalid payload." in data["message"]
+    assert "fail" in data["status"]

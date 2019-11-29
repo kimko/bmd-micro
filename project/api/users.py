@@ -78,5 +78,19 @@ class Users(Resource):
             app.logger.info(response_object["message"])
             return response_object, 404
 
-    def put(self):
-        return {}, 999
+    def put(self, user_id):
+        post_data = request.get_json()
+        response_object = {"status": "fail", "message": "Invalid payload."}
+        if not post_data:
+            app.logger.info(response_object["message"])
+            return response_object, 400
+        try:
+            user = User.update(user_id, post_data)
+            response_object["status"] = "success"
+            response_object["message"] = f"{user.id} was updated!"
+            app.logger.info(response_object["message"])
+            return response_object, 200
+        except KeyError:
+            response_object = {"status": "fail", "message": "User does not exist"}
+            app.logger.info(response_object["message"])
+            return response_object, 404

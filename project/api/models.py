@@ -40,3 +40,9 @@ class User:
 
     def delete(id):
         return USERS.pop(id)
+
+    def update(id, args):
+        user = USERS[id]
+        for key, value in args.items():
+            setattr(user, key, value)
+        return user
