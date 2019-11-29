@@ -6,8 +6,7 @@ from uuid import uuid4
 USERS = {}
 
 
-class User():
-
+class User:
     def __init__(self, email, lastName="", firstName="", zipCode=""):
         self.id = str(uuid4())
         self.lastName = lastName
