@@ -41,15 +41,15 @@ class Users(Resource):
 
     def get(self, user_id):
         response_object = {"status": "fail", "message": "User does not exist"}
-        user = User.read(user_id)
-        if not user:
-            return response_object, 404
-        else:
+        try:
+            user = User.read(user_id)
             response_object = {
                 "status": "success",
                 "data": user.to_json(),
             }
             return response_object, 200
+        except KeyError:
+            return response_object, 404
 
     def delete(self, user_id):
         return {}, 999

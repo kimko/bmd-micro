@@ -3,7 +3,7 @@
 
 from uuid import uuid4
 
-USERS = []
+USERS = {}
 
 
 class User():
@@ -25,18 +25,16 @@ class User():
         }
 
     def create(self):
-        USERS.append(self)
+        USERS[self.id] = self
         return self
 
     def read(id=""):
         if id:
-            for user in USERS:
-                if user.id == id:
-                    return user
+            return USERS[id]
         else:
-            return [user.to_json() for user in USERS]
+            return [user.to_json() for key, user in USERS.items()]
 
     def find(email):
-        for user in USERS:
+        for key, user in USERS.items():
             if user.email == email:
                 return user
