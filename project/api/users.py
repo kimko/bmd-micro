@@ -22,13 +22,17 @@ class UserList(Resource):
         response_object = {"status": "fail", "message": "Invalid payload."}
         if not post_data:
             return response_object, 400
-        lastName = post_data.get("lastName")
-        firstName = post_data.get("firstName")
-        email = post_data.get("email")
-        zipCode = post_data.get("zipCode")
-        User(lastName, firstName, email, zipCode).create()
-        response_object = {"status": "success", "message": f"{email} was added!"}
-        return response_object, 201
+        try:
+            email = post_data["email"]
+            if not User.find(email):
+                User(**post_data).create()
+                response_object = {"status": "success", "message": f"{email} was added!"}
+                return response_object, 201
+            else:
+                response_object["message"] = "User with email {} already exists.".format(email)
+                return response_object, 400
+        except KeyError:
+            return response_object, 400
 
 
 class Users(Resource):

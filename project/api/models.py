@@ -8,7 +8,7 @@ USERS = []
 
 class User():
 
-    def __init__(self, lastName, firstName, email, zipCode):
+    def __init__(self, email, lastName="", firstName="", zipCode=""):
         self.id = str(uuid4())
         self.lastName = lastName
         self.firstName = firstName
@@ -30,3 +30,8 @@ class User():
     def read(id=""):
         if not id:
             return [user for user in USERS]
+
+    def find(email):
+        for user in USERS:
+            if user["email"] == email:
+                return user
