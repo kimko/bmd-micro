@@ -18,3 +18,9 @@ test:
 	docker-compose exec api flake8 project
 	docker-compose exec api black project --check
 	docker-compose exec api /bin/sh -c "isort project/*/*.py --check-only"
+
+deploy:
+	docker build -f Dockerfile.prod -t registry.heroku.com/bmd-micro/web .
+	docker push registry.heroku.com/bmd-micro/web:latest
+	heroku container:release web
+	heroku logs -t -a bmd-micro
