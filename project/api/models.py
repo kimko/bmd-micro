@@ -37,3 +37,6 @@ class User:
         for key, user in USERS.items():
             if user.email == email:
                 return user
+
+    def delete(id):
+        return USERS.pop(id)

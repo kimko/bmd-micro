@@ -67,7 +67,16 @@ class Users(Resource):
             return response_object, 404
 
     def delete(self, user_id):
-        return {}, 999
+        response_object = {"status": "fail", "message": "User does not exist"}
+        try:
+            user = User.delete(user_id)
+            response_object["status"] = "success"
+            response_object["message"] = f"{user.email} was removed!"
+            app.logger.info(response_object["message"])
+            return response_object, 200
+        except KeyError:
+            app.logger.info(response_object["message"])
+            return response_object, 404
 
     def put(self):
         return {}, 999
