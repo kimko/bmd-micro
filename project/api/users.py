@@ -6,11 +6,14 @@ from flask_restful import Resource
 
 from project.api.models import User
 
+from project.api.metrics import timing
+
 
 class UserList(Resource):
     """shows a list of all users, and lets you POST to add a new user
     """
 
+    @timing
     def get(self):
         response_object = {
             "status": "success",
@@ -20,6 +23,7 @@ class UserList(Resource):
         app.logger.info(response_object["message"])
         return response_object, 200
 
+    @timing
     def post(self):
         post_data = request.get_json()
         response_object = {"status": "fail", "message": "Invalid payload."}
@@ -51,6 +55,7 @@ class Users(Resource):
     """shows a single User and lets you delete and update a User
     """
 
+    @timing
     def get(self, user_id):
         response_object = {"status": "fail", "message": "User does not exist"}
         try:
@@ -66,6 +71,7 @@ class Users(Resource):
             app.logger.info(response_object["message"])
             return response_object, 404
 
+    @timing
     def delete(self, user_id):
         response_object = {"status": "fail", "message": "User does not exist"}
         try:
@@ -78,6 +84,7 @@ class Users(Resource):
             app.logger.info(response_object["message"])
             return response_object, 404
 
+    @timing
     def put(self, user_id):
         post_data = request.get_json()
         response_object = {"status": "fail", "message": "Invalid payload."}
