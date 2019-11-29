@@ -25,13 +25,18 @@ class User():
         }
 
     def create(self):
-        USERS.append(self.to_json())
+        USERS.append(self)
+        return self
 
     def read(id=""):
-        if not id:
-            return [user for user in USERS]
+        if id:
+            for user in USERS:
+                if user.id == id:
+                    return user
+        else:
+            return [user.to_json() for user in USERS]
 
     def find(email):
         for user in USERS:
-            if user["email"] == email:
+            if user.email == email:
                 return user

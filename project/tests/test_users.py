@@ -1,5 +1,7 @@
 import json
 
+from project.tests.utils import add_user
+
 
 def test_add_user(test_app):
     client = test_app.test_client()
@@ -58,6 +60,26 @@ def test_add_user_duplicate_email(test_app):
     data = json.loads(resp.data.decode())
     assert resp.status_code == 400
     assert "User with email kim@blurgh.io already exists." in data["message"]
+    assert "fail" in data["status"]
+
+
+def test_single_user(test_app):
+    user = add_user(email="single@blurgh.io", firstName="single")
+    client = test_app.test_client()
+    resp = client.get(f"/users/{user.id}")
+    data = json.loads(resp.data.decode())
+    assert resp.status_code == 200
+    assert "single" in data["data"]["firstName"]
+    assert "single@blurgh.io" in data["data"]["email"]
+    assert "success" in data["status"]
+
+
+def test_single_user_wrong_id(test_app):
+    client = test_app.test_client()
+    resp = client.get("/users/blah")
+    data = json.loads(resp.data.decode())
+    assert resp.status_code == 404
+    assert "User does not exist" in data["message"]
     assert "fail" in data["status"]
 
 
