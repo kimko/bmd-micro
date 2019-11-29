@@ -1,7 +1,7 @@
 # project/api/users.py
 
-from flask import request
 from flask import current_app as app
+from flask import request
 from flask_restful import Resource
 
 from project.api.models import User
