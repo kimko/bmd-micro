@@ -8,6 +8,11 @@ from flask import current_app as app
 
 
 def timing(f):
+    """I time the execution time of any function when used as a decorator and log to the flask application looker.
+
+    Decorator function that utilizes functools.wraps to copy over all arguments of the passed function (f)
+    """
+
     @wraps(f)
     def wrapper(*args, **kwargs):
         start = time()

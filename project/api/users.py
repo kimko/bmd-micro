@@ -1,16 +1,25 @@
 # project/api/users.py
+"""All routes pertaining to the user object are manged here.
+The flask-restful resources will be mapped to a route in project.__init__.
+All user interactions will be logged in a structured way (time stamp, module, message)
 
+Execution of each route will be timed and logged.
+    IE - Updating a user object with aput request:
+    [2019-11-29 23:43:48,060] in users: 864acfcc-ae05-4485-80c9-1066bc761c11 was updated!
+    [2019-11-29 23:43:48,062] in metrics: Users.put() 1.67ms
+"""
 from flask import current_app as app
 from flask import request
 from flask_restful import Resource
 
-from project.api.models import User
-
 from project.api.metrics import timing
+from project.api.models import User
 
 
 class UserList(Resource):
-    """shows a list of all users, and lets you POST to add a new user
+    """shows a list of all users, and lets you POST to add a new user. Implemented routes:
+        get: returns all users
+        post(payload): creates a new user (if email does not exist yet)
     """
 
     @timing
@@ -52,7 +61,10 @@ class UserList(Resource):
 
 
 class Users(Resource):
-    """shows a single User and lets you delete and update a User
+    """manages single users. Implemented routes:
+        get(id): returns a user
+        delete(id): deletes a user
+        put(id, payload): updates a user
     """
 
     @timing

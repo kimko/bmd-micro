@@ -1,4 +1,6 @@
 # project/tests/test_config.py
+"""Tests for the app configuration
+"""
 
 
 def test_development_config(test_app):
