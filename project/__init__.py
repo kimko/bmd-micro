@@ -11,9 +11,6 @@ db = SQLAlchemy()
 
 
 def create_app(script_info=None):
-    from project.config import LoggerConfig
-
-    LoggerConfig()
 
     # instantiate the app
     app = Flask(__name__)
@@ -21,7 +18,10 @@ def create_app(script_info=None):
     # set config
     app_settings = os.getenv("APP_SETTINGS")
     app.config.from_object(app_settings)
+    app.config.from_object("project.config_custom.ProductionConfig")
+    from logging.config import dictConfig
 
+    dictConfig(app.config["LOGGER"])
     db.init_app(app)
 
     api = Api(app)
