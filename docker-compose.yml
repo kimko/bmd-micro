@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    entrypoint: ['/usr/src/app/entrypoint.sh']
     volumes:
       - .:/usr/src/app
     ports:
@@ -13,3 +14,17 @@ services:
     environment:
       - FLASK_ENV=development
       - APP_SETTINGS=project.config.DevelopmentConfig
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/bmdmicro_dev
+      - DATABASE_TEST_URL=postgresql://postgres:postgres@db:5432/bmdmicro_dev
+    depends_on:
+      - db
+
+  db:
+    build:
+      context: ./project/db
+      dockerfile: Dockerfile
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
