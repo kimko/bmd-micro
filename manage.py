@@ -1,4 +1,6 @@
-# app.py
+# mangage.py
+""" Flask CLI to manage the app
+"""
 
 from flask.cli import FlaskGroup
 

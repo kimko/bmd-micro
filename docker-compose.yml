@@ -1,3 +1,5 @@
+# spin up api and db container for development and testing
+
 version: '3.7'
 
 services:

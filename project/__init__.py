@@ -1,5 +1,7 @@
 # project/__init__.py
-
+"""A flask app with sql extension to be used as a micro serive.
+MVP to manage users in a database
+"""
 import os
 
 from flask import Flask

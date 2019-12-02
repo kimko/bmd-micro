@@ -1,3 +1,5 @@
+# Do some testing and demoing against the development api
+
 curl -d '{ "email": "angela.merkel@bundestag.de", "firstName": "Angela", "lastName": "Merkel", "zipCode": "97202"}' -H "Content-Type: application/json" -X  POST localhost:5000/users
 
 sleep 1

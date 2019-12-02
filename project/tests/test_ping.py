@@ -1,5 +1,6 @@
 # project/tests/test_ping.py
-
+"""Test the ping rounte
+"""
 
 import json
 

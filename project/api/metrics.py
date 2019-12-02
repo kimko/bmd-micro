@@ -1,5 +1,9 @@
 # project/api/metrics.py
+"""Helper functions to measure and log metrics.
 
+Returns:
+    timing -- Decorator to measure and log execution time
+"""
 
 from functools import wraps
 from time import time

@@ -1,4 +1,6 @@
 #!/bin/sh
+# During image startup for test/dev wait for postgres before
+# starting the flask server
 
 echo "Waiting for postgres..."
 

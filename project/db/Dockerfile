@@ -1,3 +1,5 @@
+# Manage the database for testing and dvelopment
+
 # pull official base image
 FROM postgres:11.4-alpine
 

@@ -1,19 +1,23 @@
 # project/api/models.py
+"""Represents the data used in the api. Models decouple the application data from application code.
 
+Returns:
+    User -- Describes a User
+"""
 
 from project import db
-
-USERS = {}
 
 
 class User(db.Model):
     """I repesent a user with the following arguments:
-        id
-        lastName
-        firstName
-        email
-        zipcode
-    A UUID id will be assigned during initilaztion.
+        id - mangaged by db
+        lastName - optional
+        firstName - optional
+        email - mandatory, must be unqiue
+        zipcode - optoinal
+
+    Arguments:
+        db {SQLAlchemy object} -- Interface to the db
     """
 
     __tablename__ = "users"
@@ -41,6 +45,8 @@ class User(db.Model):
         self.zipCode = zipCode
 
     def to_json(self):
+        """I return all user elements as a key value pair.
+        """
         return {
             "id": self.id,
             "lastName": self.lastName,
@@ -50,20 +56,49 @@ class User(db.Model):
         }
 
     def create(self):
+        """I wirte a user object to the DB
+
+        Returns:
+            User -- returns the created object
+        """
         db.session.add(self)
         db.session.commit()
         return self
 
     def read(id=""):
+        """I read either all or one uer from the db
+
+        Keyword Arguments:
+            id {integer} -- If supplied, returns one user (default: {""})
+
+        Returns:
+            User/s -- one user dictenory or a list of user dicts
+        """
         if id:
             return User.query.filter_by(id=int(id)).first()
         else:
             return [user.to_json() for user in User.query.all()]
 
     def find_by_email(email):
+        """ I find one user based on the given email
+
+        Keyword Arguments:
+            email {string} -- a email
+
+        Returns:
+            User -- one user dictenory or False
+        """
         return User.query.filter_by(email=email).first()
 
     def delete(id):
+        """I delete one user based on the given id
+
+        Arguments:
+            id {int} -- A user id
+
+        Returns:
+            User -- user object or false
+        """
         user = User.query.filter_by(id=int(id)).first()
         if user:
             db.session.delete(user)
@@ -73,6 +108,15 @@ class User(db.Model):
             return False
 
     def update(id, args):
+        """I update a user
+
+        Arguments:
+            id {ineger} -- User ID
+            args {dictionary} -- Dictionary with user attributes
+
+        Returns:
+            [type] -- [description]
+        """
         user = User.query.filter_by(id=int(id)).first()
         if user:
             for key, value in args.items():

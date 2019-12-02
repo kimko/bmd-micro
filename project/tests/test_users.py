@@ -1,3 +1,6 @@
+# project/tests/test_users.py
+"""Test all user routes
+"""
 import json
 
 from project.tests.utils import add_user
