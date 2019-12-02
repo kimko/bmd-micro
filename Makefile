@@ -24,4 +24,4 @@ deploy:
 	docker build -f Dockerfile.prod -t registry.heroku.com/bmd-micro/web .
 	docker push registry.heroku.com/bmd-micro/web:latest
 	heroku container:release web
-	heroku logs -t -a bmd-micro
+	heroku logs -t -a bmd-micro --source app

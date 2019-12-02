@@ -8,9 +8,7 @@ class BaseConfig:
 
     LOGGER = {
         "version": 1,
-        "formatters": {
-            "default": {"format": "[%(asctime)s] in %(module)s: %(message)s"}
-        },
+        "formatters": {"default": {"format": "%(module)s: %(message)s"}},
         "handlers": {
             "wsgi": {
                 "class": "logging.StreamHandler",
