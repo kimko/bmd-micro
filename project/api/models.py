@@ -1,12 +1,18 @@
 # project/api/models.py
 
 
+import os
 from uuid import uuid4
+
+from sqlalchemy.sql import func
+
+from project import db
+
 
 USERS = {}
 
 
-class User:
+class User(db.Model):
     """I repesent a user with the following arguments:
         id
         lastName
@@ -15,6 +21,14 @@ class User:
         zipcode
     A UUID id will be assigned during initilaztion.
     """
+
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    email = db.Column(db.String(128), nullable=False)
+    lastName = db.Column(db.String(128), nullable=True)
+    firstName = db.Column(db.String(128), nullable=True)
+    zipCode = db.Column(db.String(5), nullable=True)
 
     def __init__(self, email, lastName="", firstName="", zipCode=""):
         """Initialize a user
@@ -27,10 +41,9 @@ class User:
             firstName {str} -- optional
             zipCode {str} -- optional
         """
-        self.id = str(uuid4())
+        self.email = email
         self.lastName = lastName
         self.firstName = firstName
-        self.email = email
         self.zipCode = zipCode
 
     def to_json(self):
@@ -43,14 +56,15 @@ class User:
         }
 
     def create(self):
-        USERS[self.id] = self
+        db.session.add(self)
+        db.session.commit()
         return self
 
     def read(id=""):
         if id:
-            return USERS[id]
+            return User.query.filter_by(id=int(id)).first()
         else:
-            return [user.to_json() for key, user in USERS.items()]
+            return [user.to_json() for user in User.query.all()]
 
     def find(email):
         for key, user in USERS.items():
