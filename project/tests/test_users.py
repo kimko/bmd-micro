@@ -3,7 +3,7 @@ import json
 from project.tests.utils import add_user
 
 
-def test_add_user(test_app):
+def test_add_user(test_app, test_database):
     client = test_app.test_client()
     resp = client.post(
         "/users",
@@ -23,7 +23,7 @@ def test_add_user(test_app):
     assert "success" in data["status"]
 
 
-def test_add_user_invalid_json(test_app):
+def test_add_user_invalid_json(test_app, test_database):
     client = test_app.test_client()
     resp = client.post("/users", data=json.dumps({}), content_type="application/json")
     data = json.loads(resp.data.decode())
@@ -32,7 +32,7 @@ def test_add_user_invalid_json(test_app):
     assert "fail" in data["status"]
 
 
-def test_add_user_invalid_json_keys(test_app):
+def test_add_user_invalid_json_keys(test_app, test_database):
     client = test_app.test_client()
     resp = client.post(
         "/users",
@@ -45,7 +45,7 @@ def test_add_user_invalid_json_keys(test_app):
     assert "fail" in data["status"]
 
 
-def test_add_user_duplicate_email(test_app):
+def test_add_user_duplicate_email(test_app, test_database):
     client = test_app.test_client()
     client.post(
         "/users",
@@ -63,7 +63,7 @@ def test_add_user_duplicate_email(test_app):
     assert "fail" in data["status"]
 
 
-def test_single_user(test_app):
+def test_single_user(test_app, test_database):
     user = add_user(email="single@blurgh.io", firstName="single")
     client = test_app.test_client()
     resp = client.get(f"/users/{user.id}")
@@ -74,7 +74,7 @@ def test_single_user(test_app):
     assert "success" in data["status"]
 
 
-def test_single_user_wrong_id(test_app):
+def test_single_user_wrong_id(test_app, test_database):
     client = test_app.test_client()
     resp = client.get("/users/blah")
     data = json.loads(resp.data.decode())
@@ -83,7 +83,7 @@ def test_single_user_wrong_id(test_app):
     assert "fail" in data["status"]
 
 
-def test_list_all_users(test_app):
+def test_list_all_users(test_app, test_database):
     client = test_app.test_client()
     resp = client.get("/users")
     data = json.loads(resp.data.decode())
@@ -92,7 +92,7 @@ def test_list_all_users(test_app):
     assert "success" in data["status"]
 
 
-def test_remove_user(test_app):
+def test_remove_user(test_app, test_database):
     user = add_user(firstName="user-to-be-removed", email="remove-me@meh.io")
     client = test_app.test_client()
     resp_one = client.get(f"/users/{user.id}")
@@ -108,7 +108,7 @@ def test_remove_user(test_app):
     assert resp_three.status_code == 404
 
 
-def test_remove_user_incorrect_id(test_app):
+def test_remove_user_incorrect_id(test_app, test_database):
     client = test_app.test_client()
     resp = client.delete("/users/999")
     data = json.loads(resp.data.decode())
@@ -117,7 +117,16 @@ def test_remove_user_incorrect_id(test_app):
     assert "fail" in data["status"]
 
 
-def test_update_user(test_app):
+def test_remove_user_invalid_id(test_app, test_database):
+    client = test_app.test_client()
+    resp = client.delete("/users/x")
+    data = json.loads(resp.data.decode())
+    assert resp.status_code == 404
+    assert "Invalid payload." in data["message"]
+    assert "fail" in data["status"]
+
+
+def test_update_user(test_app, test_database):
     user = add_user(firstName="user-to-be-updated", email="update-me@meh.io")
     client = test_app.test_client()
     resp_one = client.put(
@@ -138,7 +147,7 @@ def test_update_user(test_app):
     assert "success" in data["status"]
 
 
-def test_update_user_incorrect_id(test_app):
+def test_update_user_incorrect_id(test_app, test_database):
     client = test_app.test_client()
     resp = client.put(
         "/users/999",
@@ -151,7 +160,20 @@ def test_update_user_incorrect_id(test_app):
     assert "fail" in data["status"]
 
 
-def test_update_user_invalid_json(test_app):
+def test_update_user_invalid_id(test_app, test_database):
+    client = test_app.test_client()
+    resp = client.put(
+        "/users/nein",
+        data=json.dumps({"firstName": "me", "email": "update-me@meh.io"}),
+        content_type="application/json",
+    )
+    data = json.loads(resp.data.decode())
+    assert resp.status_code == 404
+    assert "Invalid payload." in data["message"]
+    assert "fail" in data["status"]
+
+
+def test_update_user_invalid_json(test_app, test_database):
     client = test_app.test_client()
     resp = client.put(
         "/users/999", data=json.dumps({}), content_type="application/json"

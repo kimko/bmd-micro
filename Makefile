@@ -1,7 +1,7 @@
 build:
 	# Build image locally.
 	docker-compose up -d --build
-	# docker-compose exec api python manage.py recreate_db
+	docker-compose exec api python manage.py recreate_db
 
 clean:
 	docker-compose down --remove-orphans

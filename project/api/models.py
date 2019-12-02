@@ -1,13 +1,7 @@
 # project/api/models.py
 
 
-import os
-from uuid import uuid4
-
-from sqlalchemy.sql import func
-
 from project import db
-
 
 USERS = {}
 
@@ -66,16 +60,24 @@ class User(db.Model):
         else:
             return [user.to_json() for user in User.query.all()]
 
-    def find(email):
-        for key, user in USERS.items():
-            if user.email == email:
-                return user
+    def find_by_email(email):
+        return User.query.filter_by(email=email).first()
 
     def delete(id):
-        return USERS.pop(id)
+        user = User.query.filter_by(id=int(id)).first()
+        if user:
+            db.session.delete(user)
+            db.session.commit()
+            return user
+        else:
+            return False
 
     def update(id, args):
-        user = USERS[id]
-        for key, value in args.items():
-            setattr(user, key, value)
-        return user
+        user = User.query.filter_by(id=int(id)).first()
+        if user:
+            for key, value in args.items():
+                setattr(user, key, value)
+                db.session.commit()
+            return user
+        else:
+            return False

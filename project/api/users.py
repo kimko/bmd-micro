@@ -41,7 +41,7 @@ class UserList(Resource):
             return response_object, 400
         try:
             email = post_data["email"]
-            if not User.find(email):
+            if not User.find_by_email(email):
                 User(**post_data).create()
                 response_object = {
                     "status": "success",
@@ -72,14 +72,18 @@ class Users(Resource):
         response_object = {"status": "fail", "message": "User does not exist"}
         try:
             user = User.read(user_id)
-            response_object = {
-                "status": "success",
-                "data": user.to_json(),
-                "message": "Get user",
-            }
-            app.logger.info(response_object["message"])
-            return response_object, 200
-        except KeyError:
+            if user:
+                response_object = {
+                    "status": "success",
+                    "data": user.to_json(),
+                    "message": "Get user",
+                }
+                app.logger.info(response_object["message"])
+                return response_object, 200
+            else:
+                app.logger.info(response_object["message"])
+                return response_object, 404
+        except ValueError:
             app.logger.info(response_object["message"])
             return response_object, 404
 
@@ -88,12 +92,16 @@ class Users(Resource):
         response_object = {"status": "fail", "message": "User does not exist"}
         try:
             user = User.delete(user_id)
-            response_object["status"] = "success"
-            response_object["message"] = f"{user.email} was removed!"
-            app.logger.info(response_object["message"])
-            return response_object, 200
-        except KeyError:
-            app.logger.info(response_object["message"])
+            if user:
+                response_object["status"] = "success"
+                response_object["message"] = f"{user.email} was removed!"
+                app.logger.info(response_object["message"])
+                return response_object, 200
+            else:
+                app.logger.info(response_object["message"])
+                return response_object, 404
+        except ValueError:
+            response_object["message"] = "Invalid payload."
             return response_object, 404
 
     @timing
@@ -105,11 +113,14 @@ class Users(Resource):
             return response_object, 400
         try:
             user = User.update(user_id, post_data)
-            response_object["status"] = "success"
-            response_object["message"] = f"{user.id} was updated!"
-            app.logger.info(response_object["message"])
-            return response_object, 200
-        except KeyError:
-            response_object = {"status": "fail", "message": "User does not exist"}
-            app.logger.info(response_object["message"])
+            if user:
+                response_object["status"] = "success"
+                response_object["message"] = f"{user.id} was updated!"
+                app.logger.info(response_object["message"])
+                return response_object, 200
+            else:
+                response_object = {"status": "fail", "message": "User does not exist"}
+                app.logger.info(response_object["message"])
+                return response_object, 404
+        except ValueError:
             return response_object, 404
