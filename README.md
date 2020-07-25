@@ -16,6 +16,39 @@ Give it a spin with
 
 ![](bmd-micro-demo.gif)
 
+## Notes for local development without container
+install postgres:
+brew install postgresql
+
+run postgres:
+brew services start postgresql
+
+check if server is listening (postgres 9.3 or higher):
+pg_isready
+/tmp:5432 - accepting connections
+
+psql --host localhost --dbname postgre
+
+postgres=# CREATE DATABASE bmdmicro_dev;
+postgres=# CREATE DATABASE bmdmicro_test;
+postgres=# CREATE DATABASE bmdmicro_prod;
+postgres=# create user postgres  with encrypted password 'postgres';
+postgres=# grant all privileges on database bmdmicro_dev to postgres;
+postgres=# grant all privileges on database bmdmicro_test to postgres;
+postgres=# grant all privileges on database bmdmicro_prod to postgres;
+
+add environment vars: (IE: ~/.virtualenvs/bmd-micro/bin/postactivate)
+export FLASK_ENV=development
+export APP_SETTINGS=project.config.DevelopmentConfig
+export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/bmdmicro_dev
+export DATABASE_TEST_URL=postgresql://postgres:postgres@localhost:5432/bmdmicro_dev
+
+create tables
+python manage.py recreate_db
+
+run the thing:
+python manage.py run -h 0.0.0.0
+
 ## Technologies
 - Core:
     - Python3.7
