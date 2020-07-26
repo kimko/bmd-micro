@@ -8,6 +8,8 @@ Execution of each route will be timed and logged.
     [2019-11-29 23:43:48,060] in users: 864acfcc-ae05-4485-80c9-1066bc761c11 was updated!
     [2019-11-29 23:43:48,062] in metrics: Users.put() 1.67ms
 """
+import json
+
 from flask import current_app as app
 from flask import request
 from flask_restful import Resource
@@ -15,25 +17,36 @@ from flask_restful import Resource
 from project.api.metrics import timing
 from project.api.models import User
 
+from project import redis
+
 
 class UserList(Resource):
     """shows a list of all users, and lets you POST to add a new user. Implemented routes:
         get: returns all users
         post(payload): creates a new user (if email does not exist yet)
     """
+    path = 'AllUsers'
 
     @timing
     def get(self):
-        response_object = {
-            "status": "success",
-            "data": {"users": User.read()},
-            "message": "Get all users",
-        }
-        app.logger.info(response_object["message"])
+        if not redis.exists(self.path):
+            app.logger.info("get UserList here")
+            response_object = {
+                "status": "success",
+                "data": {"users": User.read()},
+                "message": "Get all users",
+            }
+            app.logger.info(response_object["message"])
+            redis.set(self.path, json.dumps(response_object))
+        else:
+            app.logger.info("read UserList from Redis")
+            response_object = json.loads(redis.get(self.path))
+
         return response_object, 200
 
     @timing
     def post(self):
+        redis.delete(self.path)
         post_data = request.get_json()
         response_object = {"status": "fail", "message": "Invalid payload."}
         if not post_data:
@@ -69,6 +82,7 @@ class Users(Resource):
 
     @timing
     def get(self, user_id):
+        app.logger.info("get user here")
         response_object = {"status": "fail", "message": "User does not exist"}
         try:
             user = User.read(user_id)
@@ -89,6 +103,7 @@ class Users(Resource):
 
     @timing
     def delete(self, user_id):
+        redis.delete('AllUsers')
         response_object = {"status": "fail", "message": "User does not exist"}
         try:
             user = User.delete(user_id)
