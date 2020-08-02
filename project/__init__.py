@@ -8,13 +8,11 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
 
-from redis import Redis
+from redis import from_url as redis_from_url
 
 
 db = SQLAlchemy()
-REDIS_URL = os.environ.get("REDIS_URL")
-REDIS_PORT = os.environ.get("REDIS_PORT")
-redis = Redis(REDIS_URL, REDIS_PORT)
+redis = redis_from_url(os.environ.get("REDIS_URL"))
 
 
 def create_app(script_info=None):
