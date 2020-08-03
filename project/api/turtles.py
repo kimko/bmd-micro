@@ -10,7 +10,8 @@ from project import redis
 from project.api.turtle_manager import Turtle_Manager
 
 
-ALL_TURTLES = 'all_turtles'
+ALL_TURTLES = 'all_turtles_1'
+REDIS_EXPIRE = 604800  # one week
 
 
 class TurtlesList(Resource):
@@ -22,7 +23,7 @@ class TurtlesList(Resource):
         """
 
         if not redis.exists(ALL_TURTLES):
-            app.logger.info("Loading Turtles from S3")
+            app.logger.info("Loading Turtles from file")
             manager = Turtle_Manager()
             response_object = {
                 "status": "success",
@@ -31,10 +32,10 @@ class TurtlesList(Resource):
             }
             app.logger.info(response_object["message"])
             redis.set(ALL_TURTLES, json.dumps(response_object))
+            redis.expire(ALL_TURTLES, REDIS_EXPIRE)
         else:
             app.logger.info("Loading Turtles from Redis")
             response_object = json.loads(redis.get(ALL_TURTLES))
-            # redis.delete(ALL_TURTLES)
 
         return response_object, 200
 
