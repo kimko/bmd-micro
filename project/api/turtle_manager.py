@@ -46,7 +46,6 @@ class Turtle_Manager():
         else:
             reader = pd.read_csv(location, chunksize=CHUNKSIZE, iterator=True)
         df = pd.concat(reader, ignore_index=True)
-        print(df.shape[0])
         df = df[df['Weight'] != 0]
         df = df[df['Carapace'] != 0]
         df = df[df['Plastron'] != 0]
@@ -64,6 +63,7 @@ class Turtle_Manager():
         df['lat'] = df['Capture Location'].map(lambda x: latLong[x][0]).astype('float32')
         df['long'] = df['Capture Location'].map(lambda x: latLong[x][1]).astype('float32')
         self.df = df
+        print(df.shape[0])
 
     def get_df(self):
         return self.df
