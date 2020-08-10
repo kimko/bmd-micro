@@ -10,9 +10,11 @@ from flask_restful import Api
 
 from redis import from_url as redis_from_url
 
+from project.api.turtle_manager import Turtle_Manager
 
 db = SQLAlchemy()
 redis = redis_from_url(os.environ.get("REDIS_URL"))
+turtle_manager = Turtle_Manager(redis)
 
 
 def create_app(script_info=None):
@@ -42,7 +44,16 @@ def create_app(script_info=None):
     api.add_resource(Users, "/users/<user_id>")
 
     from project.api.turtles import TurtlesList
-
     api.add_resource(TurtlesList, "/turtles")
+
+    # get_count_per_period_and_year
+    # example:
+    # curl 'localhost:5000/turtlesPeriodYear?period=m'
+    from project.api.turtles import TurtlesPeriodYear
+    api.add_resource(TurtlesPeriodYear, "/turtlesPeriodYear")
+
+    # example  curl 'localhost:5000/turtlesPeriodStartToEnd?period=m&endDate=2012-12-31'
+    from project.api.turtles import TurtlesPeriodStartToEnd
+    api.add_resource(TurtlesPeriodStartToEnd, "/turtlesPeriodStartToEnd")
 
     return app
