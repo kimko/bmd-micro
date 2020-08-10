@@ -8,11 +8,6 @@ from project.api.metrics import timing
 from project import turtle_manager
 
 
-ALL_TURTLES = 'all_turtles_2'
-PERIOD_YEAR = 'period_year_1'
-REDIS_EXPIRE = 604800  # one week
-
-
 class TurtlesList(Resource):
 
     @timing

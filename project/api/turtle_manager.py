@@ -11,7 +11,7 @@ from project.api.metrics import timing
 CHUNKSIZE = 1000
 URL = 'https://s3-us-west-2.amazonaws.com/cool-turtles/turtles.csv'
 ALL_TURTLES = 'all_turtles_5'
-PERIOD_YEAR = 'period_year_11'
+PERIOD_YEAR = 'period_year_12'
 PERIOD_START_TO_END = 'period_start_to_end_2'
 REDIS_EXPIRE = 604800  # one week
 
@@ -68,7 +68,7 @@ class Turtle_Manager():
         elif period == 'Q':
             df['Period'] = df.Date.map(lambda x: 'Q' + str(x.quarter))
         elif period == 'S':
-            df['Period'] = df.Date.map(lambda x: 'Q' + str(x.quarter))
+            df['Period'] = df.Date.dt.month.map(lambda x: 'Early' if x < 9 else 'Late')
         df = df[['Period', 'Year', 'ID']].sort_values('Period').copy()
         df = df.groupby(['Period', 'Year']).count().reset_index()
         df.columns = ['Period', 'Year', 'Count']
@@ -128,4 +128,9 @@ class Turtle_Manager():
 
 
 if __name__ == '__main__':
-    df = Turtle_Manager().get_df()
+    import os
+    from redis import from_url as redis_from_url
+
+    redis = redis_from_url(os.environ.get("REDIS_URL"))
+    tm = Turtle_Manager(redis)
+    df = tm.df_all
