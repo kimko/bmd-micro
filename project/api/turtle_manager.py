@@ -13,6 +13,7 @@ URL = 'https://s3-us-west-2.amazonaws.com/cool-turtles/turtles.csv'
 ALL_TURTLES = 'all_turtles_5'
 PERIOD_YEAR = 'period_year_12'
 PERIOD_START_TO_END = 'period_start_to_end_2'
+SUM_YEAR_SEASON_VICTORY = 'sum_year_season_victory_2'
 REDIS_EXPIRE = 604800  # one week
 
 
@@ -91,6 +92,51 @@ class Turtle_Manager():
             return df
         else:
             print(f"FROM REDIS Count Per {period} and year, locationfilter {locations}")
+            return self.context.deserialize(self.redis.get(redisKey))
+
+    def _sum_year_season_victory(self, locations=[]):
+        """
+        _sum_year_season_victory
+        """
+        df = self.df_all.copy()
+        if len(locations) > 0:
+            df = df[df['Capture Location'].isin(locations)]
+        df['Period'] = df.Date.dt.month.map(lambda x: 'Early' if x < 9 else 'Late')
+        df = df[['Period', 'Year', 'ID']].sort_values('Period').copy()
+        df.Year = df.Year.apply(str)
+        df = df.groupby(['Year', 'Period']).count().unstack()
+        df.columns = ['Early', 'Late']
+        df = df.fillna(0)
+        df['Total'] = df.Early + df.Late
+        # 👇 refactor this block
+        # seems waay to convoluted but I don't
+        # care right now
+        df = df.reset_index().set_index('Year')
+        df = df.stack().to_frame().reset_index()
+        df.columns = ['Year', 'Period', 'Count']
+        x = df.groupby('Year')
+        res = {}
+        for name, group in x:
+            res[name] = [{'Period': df[0], 'Count': df[1]} for df in group[['Period', 'Count']].values]
+        # 👆😬 refactor block
+        return res
+
+    @timing
+    def sum_year_season_victory(self, locations=[]):
+        """
+        sum_year_season_victory
+        """
+        # TODO refactor redis pattern
+        locations.sort()
+        redisKey = SUM_YEAR_SEASON_VICTORY + str(locations)
+        if not self.redis.exists(redisKey):
+            print(f"REBUILD sum_year_season_victory {locations}")
+            df = self._sum_year_season_victory(locations)
+            self.redis.set(redisKey, self.context.serialize(df).to_buffer().to_pybytes())
+            self.redis.expire(redisKey, REDIS_EXPIRE)
+            return df
+        else:
+            print(f"FROM REDIS sum_year_season_victory {locations}")
             return self.context.deserialize(self.redis.get(redisKey))
 
     def _get_periodStart_to_endDate(self, period, endDate):

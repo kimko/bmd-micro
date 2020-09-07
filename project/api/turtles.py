@@ -55,6 +55,35 @@ class TurtlesPeriodYear(Resource):
         }, 500
 
 
+class SumYearSeasonVictory(Resource):
+
+    @timing
+    def get(self):
+        """
+        Get data by period and year
+        """
+        locations = literal_eval(request.args.get('locations', '[]'))
+        app.logger.info("Get data by SumYearSeasonVictory")
+        try:
+            return {
+                "status": "success",
+                "data": {"turtles": turtle_manager.sum_year_season_victory(locations)},
+                "message": "data by SumYearSeasonVictory",
+            }, 200
+        except ValueError as err:
+            return {
+                "status": "error",
+                "data": {"turtles": None},
+                "message": f"{err}",
+            }, 400
+
+        return {
+            "status": "error",
+            "data": {"turtles": None},
+            "message": "Uncaught server exeception",
+        }, 500
+
+
 class TurtlesPeriodStartToEnd(Resource):
 
     @timing
