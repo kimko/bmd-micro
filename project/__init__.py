@@ -7,6 +7,7 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
+from flask_cors import CORS
 
 from redis import from_url as redis_from_url
 
@@ -21,6 +22,7 @@ def create_app(script_info=None):
 
     # instantiate the app
     app = Flask(__name__)
+    CORS(app)
 
     # set config
 
