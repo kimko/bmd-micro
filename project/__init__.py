@@ -57,6 +57,9 @@ def create_app(script_info=None):
     from project.api.turtles import SumYearSeasonVictory
     api.add_resource(SumYearSeasonVictory, "/sumYearSeasonVictory")
 
+    from project.api.turtles import GetTwoDimensionsPerGenderVictory
+    api.add_resource(GetTwoDimensionsPerGenderVictory, "/getTwoDimensionsPerGenderVictory")
+
     # example  curl 'localhost:5000/turtlesPeriodStartToEnd?period=m&endDate=2012-12-31'
     from project.api.turtles import TurtlesPeriodStartToEnd
     api.add_resource(TurtlesPeriodStartToEnd, "/turtlesPeriodStartToEnd")

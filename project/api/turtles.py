@@ -84,6 +84,43 @@ class SumYearSeasonVictory(Resource):
         }, 500
 
 
+class GetTwoDimensionsPerGenderVictory(Resource):
+
+    @timing
+    def get(self):
+        """
+        get_two_dimensions_per_gender
+        """
+        locations = literal_eval(request.args.get('locations', '[]'))
+        dim1 = request.args.get('dim1', 'Weight')
+        dim2 = request.args.get('dim2', 'Annuli')
+        app.logger.info("Get data by GetTwoDimensionsPerGenderVictory", dim1, dim2, locations)
+        try:
+            return {
+                "status": "success",
+                "data": {"turtles": turtle_manager.get_two_dimensions_per_gender_victory(
+                    dim1,
+                    dim2,
+                    locations),
+                    "key": "Gender",
+                    "x": dim1,
+                    "y": dim2, },
+                "message": "data by GetTwoDimensionsPerGenderVictory ",
+            }, 200
+        except ValueError as err:
+            return {
+                "status": "error",
+                "data": {"turtles": None},
+                "message": f"{err}",
+            }, 400
+
+        return {
+            "status": "error",
+            "data": {"turtles": None},
+            "message": "Uncaught server exeception",
+        }, 500
+
+
 class TurtlesPeriodStartToEnd(Resource):
 
     @timing

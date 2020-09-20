@@ -13,7 +13,8 @@ URL = 'https://s3-us-west-2.amazonaws.com/cool-turtles/turtles.csv'
 ALL_TURTLES = 'all_turtles_5'
 PERIOD_YEAR = 'period_year_12'
 PERIOD_START_TO_END = 'period_start_to_end_2'
-SUM_YEAR_SEASON_VICTORY = 'sum_year_season_victory_2'
+SUM_YEAR_SEASON_VICTORY = 'sum_year_season_victory_1'
+GET_TWO_DIMENSIONS_PER_GENDER_VICTORY = 'get_two_dimensions_per_gender_vicoty_2'
 REDIS_EXPIRE = 604800  # one week
 
 
@@ -137,6 +138,40 @@ class Turtle_Manager():
             return df
         else:
             print(f"FROM REDIS sum_year_season_victory {locations}")
+            return self.context.deserialize(self.redis.get(redisKey))
+
+    def _get_two_dimensions_per_gender_victory(self, dim1='Weight', dim2='Annuli', locations=[]):
+        """
+        _get_two_dimensions_per_gender_victory
+        """
+        df = self.df_all.copy()
+        if len(locations) > 0:
+            df = df[df['Capture Location'].isin(locations)]
+
+        # df = df.stack().to_frame().reset_index()
+        # df.columns = ['Year', 'Period', 'Count']
+        x = df.groupby('Gender')
+        res = {}
+        for name, group in x:
+            res[name] = [{'x': df[0], 'y': df[1]} for df in group[[dim1, dim2]].values]
+        return res
+
+    @timing
+    def get_two_dimensions_per_gender_victory(self, dim1='Weight', dim2='Annuli', locations=[]):
+        """
+        get_two_dimensions_per_gender_victory
+        """
+        # TODO refactor redis pattern
+        locations.sort()
+        redisKey = GET_TWO_DIMENSIONS_PER_GENDER_VICTORY + str(locations) + dim1 + dim2
+        if not self.redis.exists(redisKey):
+            print(f"REBUILD get_two_dimensions_per_gender_victory {locations} {dim1} {dim2}")
+            df = self._get_two_dimensions_per_gender_victory(dim1, dim2, locations)
+            self.redis.set(redisKey, self.context.serialize(df).to_buffer().to_pybytes())
+            self.redis.expire(redisKey, REDIS_EXPIRE)
+            return df
+        else:
+            print(f"REBUILD get_two_dimensions_per_gender_victory {locations} {dim1} {dim2}")
             return self.context.deserialize(self.redis.get(redisKey))
 
     def _get_periodStart_to_endDate(self, period, endDate):
