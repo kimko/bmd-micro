@@ -4,6 +4,8 @@ from datetime import datetime
 
 import pandas as pd
 
+import numpy as np
+
 import pyarrow as pa
 
 from project.api.metrics import timing
@@ -14,8 +16,19 @@ ALL_TURTLES = 'all_turtles_5'
 PERIOD_YEAR = 'period_year_12'
 PERIOD_START_TO_END = 'period_start_to_end_2'
 SUM_YEAR_SEASON_VICTORY = 'sum_year_season_victory_1'
-GET_TWO_DIMENSIONS_PER_GENDER_VICTORY = 'get_two_dimensions_per_gender_vicoty_2'
+GET_TWO_DIMENSIONS_PER_GENDER_VICTORY = 'get_two_dimensions_per_gender_vicoty_6'
 REDIS_EXPIRE = 604800  # one week
+
+
+def getTrend(df):
+    x = df.iloc[:, 0]
+    y = df.iloc[:, 1]
+    z = np.polyfit(x, y, 1)
+    p = np.poly1d(z)
+    return {
+        'data': [{'x': datum, 'y': p(datum)} for datum in x],
+        'eqtx': f"y={z[0]:.4f} x={z[1]:.4f}"
+    }
 
 
 class Turtle_Manager():
@@ -153,7 +166,8 @@ class Turtle_Manager():
         x = df.groupby('Gender')
         res = {}
         for name, group in x:
-            res[name] = [{'x': df[0], 'y': df[1]} for df in group[[dim1, dim2]].values]
+            res[name] = {'data': [{dim1: nd[0], dim2: nd[1]} for nd in group[[dim1, dim2]].values],
+                         'trend': getTrend(group[[dim1, dim2]])}
         return res
 
     @timing

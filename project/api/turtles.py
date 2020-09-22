@@ -94,7 +94,7 @@ class GetTwoDimensionsPerGenderVictory(Resource):
         locations = literal_eval(request.args.get('locations', '[]'))
         dim1 = request.args.get('dim1', 'Weight')
         dim2 = request.args.get('dim2', 'Annuli')
-        app.logger.info("Get data by GetTwoDimensionsPerGenderVictory", dim1, dim2, locations)
+        app.logger.info(f"Get data by GetTwoDimensionsPerGenderVictory {dim1} {dim2} {locations}")
         try:
             return {
                 "status": "success",
@@ -105,7 +105,7 @@ class GetTwoDimensionsPerGenderVictory(Resource):
                     "key": "Gender",
                     "x": dim1,
                     "y": dim2, },
-                "message": "data by GetTwoDimensionsPerGenderVictory ",
+                "message": f"data by GetTwoDimensionsPerGenderVictory {dim1} {dim2} {locations}",
             }, 200
         except ValueError as err:
             return {
