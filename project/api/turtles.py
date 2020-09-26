@@ -33,7 +33,18 @@ class TurtlesPeriodYear(Resource):
         Get data by period and year
         """
         period = request.args.get('period', 'M').upper()
-        locations = literal_eval(request.args.get('locations', '[]'))
+        # TODO Refactor 👇
+        try:
+            # Works for dash / flask request
+            locations = literal_eval(request.args.get('locations', '[]'))
+        except SyntaxError:
+            # works for "normal" http request like so locations=Whitaker%20Ponds,Gresham
+            locations = request.args.get('locations', '[]').split(',')
+        except ValueError:
+            # works for "normal" http request like so locations=Gresham
+            locations = request.args.get('locations', '[]').split(',')
+        if (not locations):
+            locations = []
         app.logger.info(f"Get data by {period} and year")
         try:
             return {
@@ -62,7 +73,18 @@ class SumYearSeasonVictory(Resource):
         """
         Get data by period and year
         """
-        locations = literal_eval(request.args.get('locations', '[]'))
+        # TODO Refactor 👇
+        try:
+            # Works for dash / flask request
+            locations = literal_eval(request.args.get('locations', '[]'))
+        except SyntaxError:
+            # works for "normal" http request like so locations=Whitaker%20Ponds,Gresham
+            locations = request.args.get('locations', '[]').split(',')
+        except ValueError:
+            # works for "normal" http request like so locations=Gresham
+            locations = request.args.get('locations', '[]').split(',')
+        if (not locations):
+            locations = []
         app.logger.info("Get data by SumYearSeasonVictory")
         try:
             return {
@@ -91,7 +113,18 @@ class GetTwoDimensionsPerGenderVictory(Resource):
         """
         get_two_dimensions_per_gender
         """
-        locations = literal_eval(request.args.get('locations', '[]'))
+        # TODO Refactor 👇
+        try:
+            # Works for dash / flask request
+            locations = literal_eval(request.args.get('locations', '[]'))
+        except SyntaxError:
+            # works for "normal" http request like so locations=Whitaker%20Ponds,Gresham
+            locations = request.args.get('locations', '[]').split(',')
+        except ValueError:
+            # works for "normal" http request like so locations=Gresham
+            locations = request.args.get('locations', '[]').split(',')
+        if (not locations):
+            locations = []
         dim1 = request.args.get('dim1', 'Weight')
         dim2 = request.args.get('dim2', 'Annuli')
         app.logger.info(f"Get data by GetTwoDimensionsPerGenderVictory {dim1} {dim2} {locations}")
