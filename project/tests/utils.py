@@ -2,7 +2,7 @@
 """testing utilities
 """
 
-from project.api.models import User
+from project.api.models.user import User
 
 
 def add_user(email="", lastName="", firstName="", zipCode=""):
