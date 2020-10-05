@@ -1,13 +1,13 @@
 build:
 	# Build image locally.
-	docker-compose up -d --build
-	docker-compose exec api python manage.py recreate_db
+	docker-compose build
 
 clean:
 	docker-compose down --remove-orphans
 
 run:
 	docker-compose up -d
+	docker-compose exec api python manage.py recreate_db
 
 logs:
 	docker logs -f bmd-micro_api_1

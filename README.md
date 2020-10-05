@@ -7,7 +7,7 @@ Steps to run locally:
 - install docker
 - 'make build'
 - 'make run'
-- 'make tests'
+- 'make test'
 - ./curl_local.sh (run some curls against the api)
 
 The app is currently deployed to production at https://bmd-micro.herokuapp.com
