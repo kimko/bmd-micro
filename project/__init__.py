@@ -37,4 +37,9 @@ def create_app(script_info=None):
     api.add_resource(UserList, "/users")
     api.add_resource(Users, "/users/<user_id>")
 
+    from project.api.rocks import RockWorldsList, RockWorlds
+
+    api.add_resource(RockWorldsList, "/rockworlds")
+    api.add_resource(RockWorlds, "/rockworlds/<world_id>")
+
     return app
