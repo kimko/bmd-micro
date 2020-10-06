@@ -8,14 +8,24 @@ from project.tests.utils import add_rockworld
 
 
 def test_add_rockworld_201(test_app, test_database):
-    world = [". .       ", ". . ::::::", " :T.::::::", ". . ::::::", "   .::::::"]
+    world = [
+        ". .       ",
+        ". . ::::::",
+        " :T.::::::",
+        ". . ::::::",
+        "   .::::::"
+    ]
     client = test_app.test_client()
     resp = client.post(
         "/rockworlds", data=json.dumps(world), content_type="application/json"
     )
 
     # Actual Test
-    processedWorld = ["  : ::::::", "  T ::::::", ".   ::::::", "::.:::::::"]
+    processedWorld = [
+        "  : ::::::",
+        "  T ::::::",
+        ".   ::::::",
+        "::.:::::::"]
     assert resp.status_code == 201
     data = json.loads(resp.data.decode())
     assert data["data"][0]["initialState"] == world

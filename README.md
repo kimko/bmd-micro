@@ -6,6 +6,7 @@ Data is stored in a postgres database.
 Steps to run locally:
 - install docker
 - 'make build'
+- 'make initDB'
 - 'make run'
 - 'make test'
 - ./curl_local.sh (run some curls against the api)

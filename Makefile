@@ -7,6 +7,8 @@ clean:
 
 run:
 	docker-compose up -d
+
+initDB:
 	docker-compose exec api python manage.py recreate_db
 
 logs:
@@ -14,7 +16,7 @@ logs:
 
 test:
 	# Run unit tests.
-	docker-compose exec api pytest "project/tests" -p no:warnings --cov="project" --cov-report html
+	docker-compose exec api pytest "project/tests" -v -p no:warnings --cov="project" --cov-report html
 	open htmlcov/index.html
 	docker-compose exec api flake8 project
 	docker-compose exec api black project --check
