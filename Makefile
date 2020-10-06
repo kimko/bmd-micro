@@ -24,6 +24,7 @@ test:
 
 deploy:
 	docker build -f Dockerfile.prod -t registry.heroku.com/bmd-micro/web .
+	heroku container:login
 	docker push registry.heroku.com/bmd-micro/web:latest
 	heroku container:release web
 	# heroku run python manage.py recreate_db
