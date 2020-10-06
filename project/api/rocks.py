@@ -38,7 +38,7 @@ class RockWorldsList(Resource):
             return response_object, 400
 
         try:
-            rockworld = RockWorld(world=",".join(post_data)).create()
+            rockworld = RockWorld(initialState=",".join(post_data)).create()
             response_object = {
                 "status": "success",
                 "message": f"World {rockworld.id} was added!",
@@ -47,12 +47,14 @@ class RockWorldsList(Resource):
             }
             app.logger.info(response_object["message"])
             return response_object, 201
-        except KeyError:
+        except KeyError as err:
             # TODO TEST missing
+            response_object["message"] += f" KeyError: {str(err)}"
             app.logger.info(response_object["message"])
             return response_object, 400
-        except TypeError:
+        except TypeError as err:
             # TODO TEST missing
+            response_object["message"] += f" TypeError: {str(err)}"
             app.logger.info(response_object["message"])
             return response_object, 400
         except ValueError as err:
@@ -75,7 +77,7 @@ class RockWorlds(Resource):
             rockworld = RockWorld.read(world_id)
             if rockworld:
                 print("API")
-                print(rockworld.world)
+                print(rockworld.initialState)
                 response_object = {
                     "status": "success",
                     "data": [rockworld.to_json()],

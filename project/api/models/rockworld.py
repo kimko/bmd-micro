@@ -10,7 +10,8 @@ from sqlalchemy.orm import validates
 class RockWorld(db.Model):
     """I repesent a RockWorld in a comma separated string:
         id - mangaged by db
-        world - text, must be comma sperated with segments of same lenght
+        initialState - text, must be comma sperated with segments of same lenght
+        finalState - text, must be comma sperated with segments of same lenght
 
     Arguments:
         db {SQLAlchemy object} -- Interface to the db
@@ -19,35 +20,43 @@ class RockWorld(db.Model):
     __tablename__ = "rockworlds"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    world = db.Column(db.Text(), nullable=False)
+    initialState = db.Column(db.Text(), nullable=False)
 
-    def __init__(self, world):
+    def __init__(self, initialState):
         """Initialize a world
 
         Arguments:
-            world {str} -- Mandatory argument
+            initialState {str} -- Mandatory argument
 
         """
-        self.world = world
+        self.initialState = initialState
+        self.finalState = self.falling_rocks()
 
-    @validates("world")
-    def validates_world(self, key, world):
-        test_world = world.split(",")
+    def falling_rocks(self):
+        self.finalState = self.initialState
+
+    @validates("initialState")
+    def validates_world(self, key, initialState):
+        test_state = initialState.split(",")
 
         # each row has the same lenght?
-        if len(set([len(row) for row in test_world])) != 1:
+        if len(set([len(row) for row in test_state])) != 1:
             raise ValueError("wrong list shape")
 
         # valid characters?
         valid = " .:T"
-        if {char for char in "".join(test_world) if char not in valid}:
+        if {char for char in "".join(test_state) if char not in valid}:
             raise ValueError("only ' .:T' allowed")
-        return world
+        return initialState
 
     def to_json(self):
         """I return all user elements as a key value pair.
         """
-        return {"id": self.id, "world": self.world.split(",")}
+        return {
+            "id": self.id,
+            "initialState": self.initialState.split(","),
+            "finalState": self.initialState.split(","),
+        }
 
     def create(self):
         """I wirte a user object to the DB
@@ -56,7 +65,7 @@ class RockWorld(db.Model):
             RockWorld -- returns the created object
         """
         print("MODEL")
-        print(self.world)
+        print(self.initialState)
         db.session.add(self)
         db.session.commit()
         return self
@@ -72,7 +81,7 @@ class RockWorld(db.Model):
         """
         if id:
             print("READ")
-            print(RockWorld.query.filter_by(id=int(id)).first().world)
+            print(RockWorld.query.filter_by(id=int(id)).first().initialState)
             return RockWorld.query.filter_by(id=int(id)).first()
         else:
             return [world.to_json() for world in RockWorld.query.all()]
