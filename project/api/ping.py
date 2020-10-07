@@ -5,7 +5,7 @@ All user interactions will be logged in a structured way (time stamp, module, me
 """
 from flask_restful import Resource
 
-from project.api.metrics import timing
+from project.api.utils.metrics import timing
 
 
 class Ping(Resource):

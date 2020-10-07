@@ -2,7 +2,7 @@ from flask import current_app as app
 from flask import request
 from flask_restful import Resource
 
-from project.api.metrics import timing
+from project.api.utils.metrics import timing
 from project.api.models.rockworld import RockWorld
 
 
