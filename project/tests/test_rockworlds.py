@@ -8,24 +8,14 @@ from project.tests.utils import add_rockworld
 
 
 def test_add_rockworld_201(test_app, test_database):
-    world = [
-        ". .       ",
-        ". . ::::::",
-        " :T.::::::",
-        ". . ::::::",
-        "   .::::::"
-    ]
+    world = [". .       ", ". . ::::::", " :T.::::::", ". . ::::::", "   .::::::"]
     client = test_app.test_client()
     resp = client.post(
         "/rockworlds", data=json.dumps(world), content_type="application/json"
     )
 
     # Actual Test
-    processedWorld = [
-        "  : ::::::",
-        "  T ::::::",
-        ".   ::::::",
-        "::.:::::::"]
+    processedWorld = ["  : ::::::", "  T ::::::", ".   ::::::", "::.:::::::"]
     assert resp.status_code == 201
     data = json.loads(resp.data.decode())
     assert data["data"][0]["initialState"] == world
@@ -111,3 +101,65 @@ def test_get_rockworlds(test_app, test_database):
     assert len(data["data"]) == 2
     assert data["data"][0]["initialState"] == world1
     assert "success" in data["status"]
+
+
+def test_update_rockworld_incorrect_id(test_app, test_database):
+    test_database.session.query(RockWorld).delete()
+    client = test_app.test_client()
+    resp = client.put("/rockworlds/999", content_type="application/json")
+    data = json.loads(resp.data.decode())
+    print(data)
+    assert resp.status_code == 404
+    assert "rockworld 999 does not exist" in data["message"]
+    assert "fail" in data["status"]
+
+
+def test_update_rockworld_invalid_payload_1(test_app, test_database):
+    test_database.session.query(RockWorld).delete()
+    world1 = ["  : ", "  T ", ".   ", "::.:"]
+    world = add_rockworld(world=",".join(world1))
+    client = test_app.test_client()
+    resp = client.put(
+        f"/rockworlds/{world.id}",
+        data=json.dumps([".:..", ".TT ", ".bla"]),
+        content_type="application/json",
+    )
+    data = json.loads(resp.data.decode())
+    assert resp.status_code == 400
+    assert "Error ValueError: only ' .:T' allowed" in data["message"]
+    assert "fail" in data["status"]
+
+
+def test_update_rockworld_update_success(test_app, test_database):
+    test_database.session.query(RockWorld).delete()
+    initialState = [
+        "  : ::::::",
+        "  T ::::::",
+        ".   ::::::",
+        "::.:::::::"
+    ]
+    newRows = [
+        ":  :.     ",
+        "    T     "
+    ]
+    finalState = [
+        "    .     ",
+        "    T     ",
+        "  : ::::::",
+        ". T ::::::",
+        ":  :::::::",
+        "::.:::::::"
+    ]
+    world = add_rockworld(world=",".join(initialState))
+    client = test_app.test_client()
+    resp = client.put(
+        f"/rockworlds/{world.id}",
+        data=json.dumps(newRows),
+        content_type="application/json",
+    )
+    assert resp.status_code == 200
+    data = json.loads(resp.data.decode())
+    assert f"rockworld {world.id} updated" in data["message"]
+    assert "success" in data["status"]
+    assert data["data"][0]["initialState"] == newRows + initialState
+    assert data["data"][0]["finalState"] == finalState

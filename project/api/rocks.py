@@ -93,3 +93,26 @@ class RockWorlds(Resource):
             # TODO test missing
             app.logger.info(response_object["message"])
             return response_object, 404
+
+    @timing
+    def put(self, world_id):
+        response_object = {"status": "fail", "message": "Error"}
+        try:
+            rockworld = RockWorld.read(world_id)
+            if rockworld:
+
+                response_object = {
+                    "status": "success",
+                    "data": [rockworld.to_json()],
+                    "message": f"rockworld {world_id} updated",
+                }
+                app.logger.info(response_object["message"])
+                return response_object, 200
+            else:
+                response_object = {"status": "fail", "message": f"rockworld {world_id} does not exist"}
+                app.logger.info(response_object["message"])
+                return response_object, 404
+        except ValueError:
+            # TODO test missing
+            app.logger.info(response_object["message"])
+            return response_object, 404

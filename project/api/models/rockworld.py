@@ -2,56 +2,10 @@
 """Represents the data used in the api. Models decouple the application data from application code.
 
 """
-
-from project import db
 from sqlalchemy.orm import validates
 
-
-def falling_rock(segment):
-    """
-    orders the list based on "falling_rocks" rules. Super
-    slow algorithm comparable to bubble sort.
-    """
-    for _ in range(len(segment)):
-        for i in range(len(segment) - 1):
-            if segment[i] == '.' and segment[i + 1] == '.':
-                segment[i], segment[i + 1] = ' ', ':'
-            if segment[i] == '.' and segment[i + 1] == ' ':
-                segment[i], segment[i + 1] = ' ', '.'
-            if segment[i] == ':' and segment[i + 1] == ' ':
-                segment[i], segment[i + 1] = ' ', ':'
-            if segment[i] == ':' and segment[i + 1] == '.':
-                segment[i], segment[i + 1] = '.', ':'
-    return segment
-
-
-def transpose_list(lists):
-    """
-    transposes a 2d array
-    """
-    return [list(x) for x in zip(*lists)]
-
-
-def falling_rocks(initialState):
-    print("INITIAL STATE")  # TODO remove print
-    print(initialState)  # TODO remove print
-    # convert string into list of strings
-    fState = initialState.split(',')
-    # transpose list of strings into segments
-    fState = transpose_list(fState)
-    # simulate "falling rock" in each segment
-    fState = [falling_rock(segment) for segment in fState]
-    # transpose back into original format
-    fState = [list(left) for left in zip(*fState)]
-    # remove empty rows
-    fState_copy = fState
-    for row, _ in enumerate(fState_copy):
-        if set(fState[row]) == ({' '}):
-            del fState[row]
-    # return as string
-    print("FINAL STATE")  # TODO remove print
-    print(",".join([''.join(row) for row in fState]))
-    return ",".join([''.join(row) for row in fState])
+from project import db
+from project.api.utils.gravity import Gravity
 
 
 class RockWorld(db.Model):
@@ -78,7 +32,7 @@ class RockWorld(db.Model):
 
         """
         self.initialState = initialState
-        self.finalState = falling_rocks(initialState)
+        self.finalState = Gravity.falling_rocks(initialState)
 
     @validates("initialState")
     def validates_world(self, key, initialState):
@@ -125,8 +79,6 @@ class RockWorld(db.Model):
             world/s -- either one dictioary or a list of dicts
         """
         if id:
-            print("READ")
-            print(RockWorld.query.filter_by(id=int(id)).first().initialState)
             return RockWorld.query.filter_by(id=int(id)).first()
         else:
             return [world.to_json() for world in RockWorld.query.all()]
