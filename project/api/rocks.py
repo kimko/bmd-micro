@@ -26,19 +26,16 @@ class RockWorldsList(Resource):
     def post(self):
         response_object = {"status": "fail", "message": "Invalid payload."}
         try:
-            post_data = request.get_json()
-            if type(post_data) is not list:
-                response_object["message"] += f" ValueError: list expected"
-                app.logger.info(response_object["message"])
-                return response_object, 400
-        except AttributeError:
-            # TODO TEST missing
-            response_object["message"] += " Json List Object expected."
-            app.logger.info(response_object["message"])
-            return response_object, 400
-
-        try:
-            rockworld = RockWorld(initialState=",".join(post_data)).create()
+            if request.args.get("random"):
+                # create random world
+                pass
+            else:
+                post_data = request.get_json()
+                if type(post_data) is not list:
+                    response_object["message"] += f" ValueError: list expected"
+                    app.logger.info(response_object["message"])
+                    return response_object, 400
+                rockworld = RockWorld(initialState=",".join(post_data)).create()
             response_object = {
                 "status": "success",
                 "message": f"World {rockworld.id} was added!",

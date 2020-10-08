@@ -8,18 +8,37 @@ from project.tests.utils import add_rockworld
 
 
 def test_add_rockworld_201(test_app, test_database):
-    world = [". .       ", ". . ::::::", " :T.::::::", ". . ::::::", "   .::::::"]
+    # fmt: off
+    world = [
+        ". .       ",
+        ". . ::::::",
+        " :T.::::::",
+        ". . ::::::",
+        "   .::::::"]
+    processedWorld = [
+        "  : ::::::",
+        "  T ::::::",
+        ".   ::::::",
+        "::.:::::::"]
+    # fmt: on
     client = test_app.test_client()
     resp = client.post(
         "/rockworlds", data=json.dumps(world), content_type="application/json"
     )
 
-    # Actual Test
-    processedWorld = ["  : ::::::", "  T ::::::", ".   ::::::", "::.:::::::"]
     assert resp.status_code == 201
     data = json.loads(resp.data.decode())
     assert data["data"][0]["initialState"] == world
     assert data["data"][0]["finalState"] == processedWorld
+    assert "success" in data["status"]
+
+
+def test_add_random_rockworld_201(test_app, test_database):
+    client = test_app.test_client()
+    # TODO mock random work generator
+    resp = client.post("/rockworlds?random=true&columns=1000&rows=1000")
+    data = json.loads(resp.data.decode())
+    assert resp.status_code == 201
     assert "success" in data["status"]
 
 
@@ -132,6 +151,7 @@ def test_update_rockworld_invalid_payload_1(test_app, test_database):
 
 def test_update_rockworld_update_success(test_app, test_database):
     test_database.session.query(RockWorld).delete()
+    # fmt: off
     initialState = [
         "  : ::::::",
         "  T ::::::",
@@ -148,8 +168,9 @@ def test_update_rockworld_update_success(test_app, test_database):
         "  : ::::::",
         ". T ::::::",
         ":  :::::::",
-        "::.:::::::"
+        "::.:::::::",
     ]
+    # fmt: on
     world = add_rockworld(world=",".join(initialState))
     client = test_app.test_client()
     resp = client.put(
