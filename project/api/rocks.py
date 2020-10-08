@@ -3,6 +3,7 @@ from flask import request
 from flask_restful import Resource
 
 from project.api.utils.metrics import timing
+from project.api.utils.gravity import RandomWorld
 from project.api.models.rockworld import RockWorld
 
 
@@ -28,7 +29,14 @@ class RockWorldsList(Resource):
         try:
             if request.args.get("random"):
                 # create random world
-                pass
+                rockworld = RockWorld(
+                    initialState=",".join(
+                        RandomWorld.generate(
+                            rows=request.args.get("rows", 10),
+                            columns=request.args.get("columns", 10),
+                        )
+                    )
+                ).create()
             else:
                 post_data = request.get_json()
                 if type(post_data) is not list:

@@ -47,3 +47,10 @@ class Gravity:
                 del fState[row]
         # return as string
         return ",".join(["".join(row) for row in fState])
+
+
+class RandomWorld:
+    @staticmethod
+    @timing
+    def generate(rows, columns):
+        return ["".join(choices(" .:T", k=int(columns))) for i in range(int(rows))]

@@ -36,7 +36,7 @@ def test_add_rockworld_201(test_app, test_database):
 def test_add_random_rockworld_201(test_app, test_database):
     client = test_app.test_client()
     # TODO mock random work generator
-    resp = client.post("/rockworlds?random=true&columns=1000&rows=1000")
+    resp = client.post("/rockworlds?random=true&columns=10&rows=10")
     data = json.loads(resp.data.decode())
     assert resp.status_code == 201
     assert "success" in data["status"]
