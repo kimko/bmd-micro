@@ -80,3 +80,24 @@ class RockWorld(db.Model):
             return RockWorld.query.filter_by(id=int(id)).first()
         else:
             return [world.to_json() for world in RockWorld.query.all()]
+
+    def update(id, data):
+        """I update an existing rockworld
+
+        Arguments:
+            id {ineger} -- rockworld ID
+            args {dictionary} -- Dictionary with rockworld attributes
+
+        Returns:
+            [type] -- [description]
+        """
+        rockworld = RockWorld.query.filter_by(id=int(id)).first()
+        if rockworld:
+            # the payload + "old" state becomes the new initial state
+            # setattr(rockworld, 'initialState', f"{data},{rockworld.finalState}")
+            rockworld.initialState = f"{data},{rockworld.finalState}"
+            rockworld.finalState = Gravity.falling_rocks(rockworld.initialState)
+            db.session.commit()
+            return rockworld
+        else:
+            return False

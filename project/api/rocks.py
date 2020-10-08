@@ -99,6 +99,13 @@ class RockWorlds(Resource):
             rockworld = RockWorld.read(world_id)
             if rockworld:
 
+                post_data = request.get_json()
+                if type(post_data) is not list:
+                    response_object["message"] += f" ValueError: list expected"
+                    app.logger.info(response_object["message"])
+                    return response_object, 400
+
+                rockworld = RockWorld.update(world_id, ",".join(post_data))
                 response_object = {
                     "status": "success",
                     "data": [rockworld.to_json()],
@@ -107,10 +114,13 @@ class RockWorlds(Resource):
                 app.logger.info(response_object["message"])
                 return response_object, 200
             else:
-                response_object = {"status": "fail", "message": f"rockworld {world_id} does not exist"}
+                response_object = {
+                    "status": "fail",
+                    "message": f"rockworld {world_id} does not exist",
+                }
                 app.logger.info(response_object["message"])
                 return response_object, 404
-        except ValueError:
-            # TODO test missing
+        except ValueError as err:
+            response_object["message"] += f" ValueError: {str(err)}"
             app.logger.info(response_object["message"])
-            return response_object, 404
+            return response_object, 400
