@@ -76,8 +76,6 @@ class RockWorlds(Resource):
         try:
             rockworld = RockWorld.read(world_id)
             if rockworld:
-                print("API")
-                print(rockworld.initialState)
                 response_object = {
                     "status": "success",
                     "data": [rockworld.to_json()],

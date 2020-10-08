@@ -63,8 +63,6 @@ class RockWorld(db.Model):
         Returns:
             RockWorld -- returns the created object
         """
-        print("MODEL")
-        print(self.initialState)
         db.session.add(self)
         db.session.commit()
         return self

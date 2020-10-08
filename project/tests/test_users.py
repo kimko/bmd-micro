@@ -144,7 +144,6 @@ def test_update_user(test_app, test_database):
     resp_two = client.get(f"/users/{user.id}")
     data = json.loads(resp_two.data.decode())
     assert resp_two.status_code == 200
-    print(data)
     assert "me" in data["data"]["firstName"]
     assert "update-me@meh.io" in data["data"]["email"]
     assert "success" in data["status"]
