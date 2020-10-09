@@ -1,6 +1,6 @@
 # Do some testing and demoing against the production api
+set -euo pipefail
 
-set -o xtrace
 echo "Create new User"
 sleep 1
 
