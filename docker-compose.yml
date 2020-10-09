@@ -30,3 +30,14 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+
+  datadog:
+    links:
+     - api
+    image: datadog/agent:latest
+    environment:
+     - DD_API_KEY=${DD_API_KEY}
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+     - /proc/:/host/proc/:ro
+     - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
